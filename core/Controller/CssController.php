@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2016, John Molakvoæ (skjnldsv@protonmail.com)
  *
@@ -36,6 +37,7 @@ use OCP\Files\IAppData;
 use OCP\Files\NotFoundException;
 use OCP\Files\SimpleFS\ISimpleFile;
 use OCP\Files\SimpleFS\ISimpleFolder;
+use OCP\IConfig;
 use OCP\IRequest;
 
 class CssController extends Controller {
@@ -46,17 +48,26 @@ class CssController extends Controller {
 	/** @var ITimeFactory */
 	protected $timeFactory;
 
+	/** @var IConfig */
+	protected $config;
+
 	/**
 	 * @param string $appName
 	 * @param IRequest $request
 	 * @param Factory $appDataFactory
 	 * @param ITimeFactory $timeFactory
+	 * @param IConfig $config
 	 */
-	public function __construct($appName, IRequest $request, Factory $appDataFactory, ITimeFactory $timeFactory) {
+	public function __construct(string $appName,
+								IRequest $request,
+								Factory $appDataFactory,
+								ITimeFactory $timeFactory,
+								IConfig $config) {
 		parent::__construct($appName, $request);
 
 		$this->appData = $appDataFactory->get('css');
 		$this->timeFactory = $timeFactory;
+		$this->config = $config;
 	}
 
 	/**
@@ -67,7 +78,7 @@ class CssController extends Controller {
 	 * @param string $appName css folder name
 	 * @return FileDisplayResponse|NotFoundResponse
 	 */
-	public function getCss($fileName, $appName) {
+	public function getCss(string $fileName, string $appName) {
 		try {
 			$folder = $this->appData->getFolder($appName);
 			$gzip = false;
@@ -80,10 +91,18 @@ class CssController extends Controller {
 		if ($gzip) {
 			$response->addHeader('Content-Encoding', 'gzip');
 		}
-		$response->cacheFor(86400);
+
+		if ($this->config->getSystemValue('debug', false)) {
+			$ttl = 86400;
+			$response->cacheFor($ttl);
+		} else {
+			$ttl = 365000000;
+			$response->addHeader('Cache-Control', 'max-age='.$ttl.', immutable');
+		}
+
 		$expires = new \DateTime();
 		$expires->setTimestamp($this->timeFactory->getTime());
-		$expires->add(new \DateInterval('PT24H'));
+		$expires->add(new \DateInterval('PT'.$ttl.'S'));
 		$response->addHeader('Expires', $expires->format(\DateTime::RFC1123));
 		$response->addHeader('Pragma', 'cache');
 		return $response;
@@ -94,8 +113,9 @@ class CssController extends Controller {
 	 * @param string $fileName
 	 * @param bool $gzip is set to true if we use the gzip file
 	 * @return ISimpleFile
+	 * @throws NotFoundException
 	 */
-	private function getFile(ISimpleFolder $folder, $fileName, &$gzip) {
+	private function getFile(ISimpleFolder $folder, string $fileName, bool &$gzip): ISimpleFile {
 		$encoding = $this->request->getHeader('Accept-Encoding');
 
 		if ($encoding !== null && strpos($encoding, 'gzip') !== false) {
