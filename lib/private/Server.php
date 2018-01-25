@@ -66,6 +66,7 @@ use OC\Contacts\ContactsMenu\ActionFactory;
 use OC\Contacts\ContactsMenu\ContactsStore;
 use OC\Diagnostics\EventLogger;
 use OC\Diagnostics\QueryLogger;
+use OC\Federation\CloudFederationProviderManager;
 use OC\Federation\CloudIdManager;
 use OC\Files\Config\UserMountCache;
 use OC\Files\Config\UserMountCacheListener;
@@ -117,6 +118,7 @@ use OCP\Collaboration\AutoComplete\IManager;
 use OCP\Contacts\ContactsMenu\IContactsStore;
 use OCP\Defaults;
 use OCA\Theming\Util;
+use OCP\Federation\ICloudFederationProviderManager;
 use OCP\Federation\ICloudIdManager;
 use OCP\Authentication\LoginCredentials\IStore;
 use OCP\Files\NotFoundException;
@@ -1103,6 +1105,10 @@ class Server extends ServerContainer implements IServerContainer {
 			return new CloudIdManager();
 		});
 
+		$this->registerService(ICloudFederationProviderManager::class, function (Server $c) {
+			return new CloudFederationProviderManager();
+		});
+
 		$this->registerAlias(\OCP\AppFramework\Utility\IControllerMethodReflector::class, \OC\AppFramework\Utility\ControllerMethodReflector::class);
 		$this->registerAlias('ControllerMethodReflector', \OCP\AppFramework\Utility\IControllerMethodReflector::class);
 
@@ -1962,6 +1968,14 @@ class Server extends ServerContainer implements IServerContainer {
 	 */
 	public function getCloudIdManager() {
 		return $this->query(ICloudIdManager::class);
+	}
+
+
+	/**
+	 * @return \OCP\Federation\ICloudFederationProviderManager
+	 */
+	public function getCloudFederationProviderManager() {
+		return $this->query(ICloudFederationProviderManager::class);
 	}
 
 	/**
