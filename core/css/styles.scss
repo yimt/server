@@ -228,8 +228,7 @@ body {
 
 #controls {
 	box-sizing: border-box;
-	position: -webkit-sticky;
-	position: sticky;
+	position: fixed;
 	height: 44px;
 	padding: 0;
 	margin: 0;
@@ -280,20 +279,12 @@ body {
 }
 
 #content {
-	position: relative;
-	height: 100%;
-	width: 100%;
 	.hascontrols {
 		margin-top: 45px;
 	}
 }
 
 #content-wrapper {
-	position: absolute;
-	height: 100%;
-	width: 100%;
-	overflow-x: hidden;
-	/* prevent horizontal scrollbar */
 	padding-top: 45px;
 	box-sizing: border-box;
 }
