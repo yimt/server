@@ -99,7 +99,7 @@ class ChunkingPlugin extends ServerPlugin {
 			return;
 		}
 		$actualSize = $this->sourceNode->getSize();
-		if ((int)$expectedSize !== $actualSize) {
+		if ((float)$expectedSize !== (float)$actualSize) {
 			throw new BadRequest("Chunks on server do not sum up to $expectedSize but to $actualSize bytes");
 		}
 	}
