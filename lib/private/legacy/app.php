@@ -147,13 +147,6 @@ class OC_App {
 		if (is_file($appPath . '/appinfo/app.php')) {
 			\OC::$server->getEventLogger()->start('load_app_' . $app, 'Load app: ' . $app);
 			self::requireAppFile($app);
-			if (self::isType($app, array('authentication'))) {
-				// since authentication apps affect the "is app enabled for group" check,
-				// the enabled apps cache needs to be cleared to make sure that the
-				// next time getEnableApps() is called it will also include apps that were
-				// enabled for groups
-				self::$enabledAppsCache = array();
-			}
 			\OC::$server->getEventLogger()->end('load_app_' . $app);
 		}
 
@@ -328,11 +321,6 @@ class OC_App {
 	}
 
 	/**
-	 * get all enabled apps
-	 */
-	protected static $enabledAppsCache = array();
-
-	/**
 	 * Returns apps enabled for the current user.
 	 *
 	 * @param bool $forceRefresh whether to refresh the cache
@@ -391,7 +379,6 @@ class OC_App {
 	 */
 	public function enable($appId,
 						   $groups = null) {
-		self::$enabledAppsCache = []; // flush
 
 		// Check if app is already downloaded
 		$installer = \OC::$server->query(Installer::class);
