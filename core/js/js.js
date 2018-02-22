@@ -680,7 +680,7 @@ var OCP = {},
 			}
 
 			if (headerMenu === true) {
-				$(event.currentTarget).parent().addClass('openedMenu');
+				$menuEl.parent().addClass('openedMenu');
 			}
 
 			$menuEl.slideToggle(OC.menuSpeed, toggle);
