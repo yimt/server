@@ -24,40 +24,32 @@
 
 namespace OC\Core\Controller;
 
+use OC\Security\CSRF\CsrfTokenManager;
 use OCP\AppFramework\Controller;
-use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
-use OCP\ISession;
 
 class CSRFTokenController extends Controller {
 
-	/** @var ISession */
-	private $session;
+	/** @var CsrfTokenManager */
+	private $tokenManager;
 
-	/**
-	 * @param string $appName
-	 * @param IRequest $request
-	 * @param ISession $session
-	 */
-	public function __construct($appName, IRequest $request, ISession $session) {
+	public function __construct($appName, IRequest $request,
+		CsrfTokenManager $tokenManager) {
 		parent::__construct($appName, $request);
-		$this->session = $session;
+		$this->tokenManager = $tokenManager;
 	}
 
 	/**
 	 * @NoAdminRequired
+	 * @NoCSRFRequired
 	 * @return JSONResponse
 	 */
 	public function index() {
-		$requestToken = $this->session->get('requesttoken');
-
-		if (is_null($requestToken)) {
-			return new JSONResponse(null, Http::STATUS_NOT_FOUND);
-		}
+		$requestToken = $this->tokenManager->getToken();
 
 		return new JSONResponse([
-			'token' => $requestToken,
+			'token' => $requestToken->getEncryptedValue(),
 		]);
 	}
 
