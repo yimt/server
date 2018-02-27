@@ -30,6 +30,14 @@ class UsersSettingsContext implements Context, ActorAwareInterface {
 	/**
 	 * @return Locator
 	 */
+	public static function newUserForm() {
+		return Locator::forThe()->id("newuserHeader")->
+				describedAs("New user form in Users Settings");
+	}
+
+	/**
+	 * @return Locator
+	 */
 	public static function userNameFieldForNewUser() {
 		return Locator::forThe()->field("newusername")->
 				describedAs("User name field for new user in Users Settings");
@@ -41,6 +49,14 @@ class UsersSettingsContext implements Context, ActorAwareInterface {
 	public static function passwordFieldForNewUser() {
 		return Locator::forThe()->field("newuserpassword")->
 				describedAs("Password field for new user in Users Settings");
+	}
+
+	/**
+	 * @return Locator
+	 */
+	public static function newUserButton() {
+		return Locator::forThe()->id("new-user-button")->
+				describedAs("New user button in Users Settings");
 	}
 
 	/**
@@ -76,6 +92,13 @@ class UsersSettingsContext implements Context, ActorAwareInterface {
 	}
 
 	/**
+	 * @When I click the New user button
+	 */
+	public function iClickTheNewUserButton($user, $password) {
+		$this->actor->find(self::newUserButton())->click();
+	}
+
+	/**
 	 * @When I create user :user with password :password
 	 */
 	public function iCreateUserWithPassword($user, $password) {
@@ -96,7 +119,16 @@ class UsersSettingsContext implements Context, ActorAwareInterface {
 	 * @Then I see that the list of users contains the user :user
 	 */
 	public function iSeeThatTheListOfUsersContainsTheUser($user) {
-		PHPUnit_Framework_Assert::assertNotNull($this->actor->find(self::rowForUser($user), 10));
+		PHPUnit_Framework_Assert::assertNotNull(
+			$this->actor->find(self::rowForUser($user), 10));
+	}
+
+	/**
+	 * @Then I see that the new user Form is shown
+	 */
+	public function iSeeThatTheNewUserFormIsShown() {
+		PHPUnit_Framework_Assert::assertTrue(
+				$this->actor->find(self::newUserForm(), 10)->isVisible());
 	}
 
 }
