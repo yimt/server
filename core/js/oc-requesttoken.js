@@ -26,10 +26,7 @@
 				$.ajax(settings);
 			},
 			// Call original error handler if possible
-			error: function() {
-				console.error('ERROR');
-				settings.error();
-			}
+			error: settings.error
 		});
 	}
 
