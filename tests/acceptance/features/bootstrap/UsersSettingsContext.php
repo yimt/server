@@ -94,7 +94,7 @@ class UsersSettingsContext implements Context, ActorAwareInterface {
 	/**
 	 * @When I click the New user button
 	 */
-	public function iClickTheNewUserButton($user, $password) {
+	public function iClickTheNewUserButton() {
 		$this->actor->find(self::newUserButton())->click();
 	}
 
